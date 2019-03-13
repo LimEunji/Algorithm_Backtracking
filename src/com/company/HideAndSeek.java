@@ -6,67 +6,48 @@ import java.util.Scanner;
 
 public class HideAndSeek {
 
-    private static boolean isSuccess = false;
+    private boolean[] isVisitied ;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int N = scanner.nextInt();
         int K = scanner.nextInt();
 
-        long startTime = System.nanoTime();
+        System.out.println(bfs(N, K));
+    }
+
+    public static int bfs(int n, int k) {
+        boolean[] isVisited = new boolean[100001];
+        int time = 0;
         Queue<Integer> queue = new LinkedList<>();
-        queue.add(N);
-        hideAndSeek(K, 0, queue);
-        long endTime = System.nanoTime();
-        System.out.println("elapsed time: " + (endTime - startTime));
-    }
+        queue.add(n);
 
-    public static void hideAndSeek(int K, int second, Queue<Integer> queue) {
-        for (int i = 0; i < Math.pow(3, second); i++) {
-            int n = queue.poll();
-            if (move(queue, n, K)) {
-                System.out.println(second+1);
-                return;
+        while (true) {
+            int size = queue.size();
+
+            for (int i = 0; i < size; i++) {
+                int pN = queue.poll();
+                if (pN == k) {
+                    return time;
+                }
+
+                if (pN > 0 && !isVisited[pN - 1]) {
+                    queue.add(pN - 1);
+                    isVisited[pN - 1] = true;
+                }
+
+                if (pN < 100000 && !isVisited[pN + 1]) {
+                    queue.add(pN + 1);
+                    isVisited[pN + 1] = true;
+                }
+
+                if (pN * 2 <= 100000 && !isVisited[pN * 2]) {
+                    queue.add(pN * 2);
+                    isVisited[pN * 2] = true;
+                }
             }
+
+            time++;
         }
-
-        hideAndSeek(K, second + 1, queue);
-    }
-
-    public static boolean move(Queue<Integer> queue, int N, int K) {
-        int nextN = 0;
-        for (int i = 0; i < 3; i++) {
-            switch (i) {
-                case 0:
-                    nextN = walkBackward(N);
-                    break;
-                case 1:
-                    nextN = walkForward(N);
-                    break;
-                case 2:
-                    nextN = teleport(N);
-                    break;
-            }
-
-            if (nextN == K) {
-                return true;
-            }
-
-            queue.add(nextN);
-        }
-
-        return false;
-    }
-
-    public static int walkBackward(int n) {
-        return n-1;
-    }
-
-    public static int walkForward(int n) {
-        return n+1;
-    }
-
-    public static int teleport(int n) {
-        return n*2;
     }
 }
